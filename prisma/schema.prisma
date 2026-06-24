@@ -1,0 +1,126 @@
+// ═══════════════════════════════════════════════════════════════════════
+// PRISMA SCHEMA — Mortgage domain models
+// ═══════════════════════════════════════════════════════════════════════
+// Mirrors an MS SQL Server schema. Switch to production with:
+//   provider = "sqlserver"
+//   url = "sqlserver://server:1433;database=LoanFlow;user=sa;password=pwd;trustServerCertificate=true"
+//
+// MS SQL type equivalents:
+//   String   → NVARCHAR    Int     → INT
+//   Float    → FLOAT       Boolean → BIT
+//   DateTime → DATETIME2   @id     → PRIMARY KEY
+//   @unique  → UNIQUE      @index  → CREATE INDEX
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Prisma 7: url is set in prisma.config.ts, not here
+datasource db {
+  provider = "sqlite"
+}
+
+// ── USER (Loan Officers + Admins) ────────────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("LOAN_OFFICER")  // ADMIN | LOAN_OFFICER | PROCESSOR
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications LoanApplication[]
+
+  @@map("users")
+  @@index([email])
+}
+
+// ── LOAN APPLICATION — Core domain model ────────────────────────────
+model LoanApplication {
+  id              String   @id @default(cuid())
+  applicationNo   String   @unique           // e.g. "APP-2024-001234"
+  status          String   @default("PENDING")
+  loanType        String                     // CONVENTIONAL | FHA | VA | JUMBO | REFINANCE | HELOC
+  loanAmount      Float
+  interestRate    Float?
+  loanTerm        Int                        // months: 180 (15yr), 360 (30yr)
+  propertyAddress String
+  propertyValue   Float
+
+  // Borrower
+  borrowerFirstName String
+  borrowerLastName  String
+  borrowerEmail     String
+  borrowerPhone     String
+  borrowerSSN       String
+  annualIncome      Float
+  creditScore       Int?
+  employmentStatus  String
+
+  // Timestamps
+  submittedAt DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  closingDate DateTime?
+  approvedAt  DateTime?
+  deniedAt    DateTime?
+
+  // Relations
+  assignedOfficerId String?
+  assignedOfficer   User?    @relation(fields: [assignedOfficerId], references: [id])
+  documents         Document[]
+  notes             LoanNote[]
+  statusHistory     StatusHistory[]
+
+  @@map("loan_applications")
+  @@index([status])
+  @@index([borrowerEmail])
+  @@index([assignedOfficerId])
+  @@index([submittedAt])
+}
+
+// ── DOCUMENT ────────────────────────────────────────────────────────
+model Document {
+  id           String   @id @default(cuid())
+  fileName     String
+  fileType     String
+  fileSize     Int
+  documentType String                        // W2 | TAX_RETURN | PAY_STUB | BANK_STATEMENT | etc.
+  uploadedAt   DateTime @default(now())
+  isVerified   Boolean  @default(false)
+
+  applicationId String
+  application   LoanApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+// ── LOAN NOTE — Internal comments ───────────────────────────────────
+model LoanNote {
+  id         String   @id @default(cuid())
+  content    String
+  isInternal Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  applicationId String
+  application   LoanApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("loan_notes")
+}
+
+// ── STATUS HISTORY — Immutable audit trail ──────────────────────────
+// MS SQL best practice: never delete — append-only history.
+model StatusHistory {
+  id          String    @id @default(cuid())
+  fromStatus  String?
+  toStatus    String
+  reason      String?
+  changedAt   DateTime  @default(now())
+  changedById String
+
+  applicationId String
+  application   LoanApplication @relation(fields: [applicationId], references: [id])
+
+  @@map("status_history")
+}
