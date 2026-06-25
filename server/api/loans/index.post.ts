@@ -26,11 +26,14 @@ export default defineEventHandler(async (event) => {
   await requireAuth(event)
   const body = await readValidatedBody(event, createLoanSchema.parse)
 
+  // Generate app number BEFORE the transaction to avoid nested lock in SQLite
+  const applicationNo = await generateApplicationNo()
+
   // $transaction: either ALL DB writes succeed or NONE do (atomic)
   // MS SQL equivalent: BEGIN TRANSACTION ... COMMIT / ROLLBACK
   const application = await prisma.$transaction(async (tx) => {
     const app = await tx.loanApplication.create({
-      data: { ...body, applicationNo: await generateApplicationNo(), status: 'PENDING' },
+      data: { ...body, applicationNo, status: 'PENDING' },
     })
     await tx.statusHistory.create({
       data: {
