@@ -56,29 +56,29 @@ const ltvRatio     = computed(() => form.propertyValue > 0 ? ((form.loanAmount /
         <h2 class="font-semibold text-slate-900">Loan Information</h2>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="label">Loan Type</label>
-            <select v-model="form.loanType" class="input">
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Loan Type</label>
+            <select v-model="form.loanType" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
               <option v-for="t in LOAN_TYPES" :key="t" :value="t">{{ t }}</option>
             </select>
           </div>
           <div>
-            <label class="label">Loan Term</label>
-            <select v-model.number="form.loanTerm" class="input">
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Loan Term</label>
+            <select v-model.number="form.loanTerm" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
               <option v-for="t in TERM_OPTIONS" :key="t.value" :value="t.value">{{ t.label }}</option>
             </select>
           </div>
           <div>
-            <label class="label">Loan Amount ($)</label>
-            <input v-model.number="form.loanAmount" type="number" min="10000" class="input" required />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Loan Amount ($)</label>
+            <input v-model.number="form.loanAmount" type="number" min="10000" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" required />
           </div>
           <div>
-            <label class="label">Property Value ($)</label>
-            <input v-model.number="form.propertyValue" type="number" min="10000" class="input" />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Property Value ($)</label>
+            <input v-model.number="form.propertyValue" type="number" min="10000" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
             <p class="text-xs text-slate-400 mt-1">LTV: {{ ltvRatio }}%</p>
           </div>
           <div class="col-span-2">
-            <label class="label">Property Address</label>
-            <input v-model="form.propertyAddress" type="text" class="input" placeholder="123 Main St, Atlanta, GA 30301" required />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Property Address</label>
+            <input v-model="form.propertyAddress" type="text" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" placeholder="123 Main St, Atlanta, GA 30301" required />
           </div>
         </div>
       </div>
@@ -88,34 +88,34 @@ const ltvRatio     = computed(() => form.propertyValue > 0 ? ((form.loanAmount /
         <h2 class="font-semibold text-slate-900">Borrower Information</h2>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="label">First Name</label>
-            <input v-model="form.borrowerFirstName" type="text" class="input" required />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">First Name</label>
+            <input v-model="form.borrowerFirstName" type="text" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" required />
           </div>
           <div>
-            <label class="label">Last Name</label>
-            <input v-model="form.borrowerLastName" type="text" class="input" required />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Last Name</label>
+            <input v-model="form.borrowerLastName" type="text" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" required />
           </div>
           <div>
-            <label class="label">Email</label>
-            <input v-model="form.borrowerEmail" type="email" class="input" required />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+            <input v-model="form.borrowerEmail" type="email" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" required />
           </div>
           <div>
-            <label class="label">Phone</label>
-            <input v-model="form.borrowerPhone" type="tel" class="input" placeholder="(555) 555-5555" />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Phone</label>
+            <input v-model="form.borrowerPhone" type="tel" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" placeholder="(555) 555-5555" />
           </div>
           <div>
-            <label class="label">SSN (XXX-XX-XXXX)</label>
-            <input v-model="form.borrowerSSN" type="text" class="input" placeholder="123-45-6789" />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">SSN (XXX-XX-XXXX)</label>
+            <input v-model="form.borrowerSSN" type="text" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" placeholder="123-45-6789" />
           </div>
           <div>
-            <label class="label">Employment Status</label>
-            <select v-model="form.employmentStatus" class="input">
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Employment Status</label>
+            <select v-model="form.employmentStatus" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
               <option v-for="e in EMP_OPTIONS" :key="e" :value="e">{{ e.replace(/_/g, ' ') }}</option>
             </select>
           </div>
           <div class="col-span-2">
-            <label class="label">Annual Income ($)</label>
-            <input v-model.number="form.annualIncome" type="number" min="0" class="input" />
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Annual Income ($)</label>
+            <input v-model.number="form.annualIncome" type="number" min="0" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
           </div>
         </div>
       </div>
@@ -130,8 +130,3 @@ const ltvRatio     = computed(() => form.propertyValue > 0 ? ((form.loanAmount /
     </form>
   </div>
 </template>
-
-<style scoped>
-.label { @apply block text-sm font-medium text-slate-700 mb-1.5; }
-.input  { @apply w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white; }
-</style>

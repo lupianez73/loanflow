@@ -1,34 +1,32 @@
 <script setup lang="ts">
-// ═══════════════════════════════════════════════════════════════════════
-// LOGIN PAGE
-// ═══════════════════════════════════════════════════════════════════════
-// definePageMeta = Nuxt macro to configure this page.
-// layout: 'auth' → uses layouts/auth.vue instead of layouts/default.vue
-// middleware: [] → no auth guard on the login page itself
-// 🔵 VUE DEV NOTE: No equivalent in plain Vue; this is Nuxt-specific.
-
 definePageMeta({ layout: 'auth', middleware: [] })
 useHead({ title: 'Sign In' })
 
 const authStore   = useAuthStore()
 const route       = useRoute()
+const email       = ref('')
+const password    = ref('')
+const errors      = reactive({ email: '', password: '' })
 const serverError = ref('')
+const submitting  = ref(false)
 
-// VeeValidate — you already know this from trading platform
-const { handleSubmit, isSubmitting } = useForm({
-  validationSchema: {
-    email:    'required|email',
-    password: 'required|min:8',
-  },
-})
+function validate() {
+  errors.email    = ''
+  errors.password = ''
+  let ok = true
+  if (!email.value)                            { errors.email    = 'Email is required';          ok = false }
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { errors.email = 'Enter a valid email'; ok = false }
+  if (!password.value)                         { errors.password = 'Password is required';       ok = false }
+  else if (password.value.length < 8)          { errors.password = 'Minimum 8 characters';       ok = false }
+  return ok
+}
 
-const { value: email,    errorMessage: emailError    } = useField<string>('email')
-const { value: password, errorMessage: passwordError } = useField<string>('password')
-
-const onSubmit = handleSubmit(async (values) => {
+async function onSubmit() {
+  if (!validate()) return
+  submitting.value  = true
   serverError.value = ''
   try {
-    await authStore.login(values.email, values.password)
+    await authStore.login(email.value, password.value)
     const redirect = route.query.redirect as string
     if (redirect) await navigateTo(redirect)
   }
@@ -36,7 +34,10 @@ const onSubmit = handleSubmit(async (values) => {
     const e = err as { data?: { statusMessage?: string } }
     serverError.value = e?.data?.statusMessage ?? 'Invalid credentials'
   }
-})
+  finally {
+    submitting.value = false
+  }
+}
 </script>
 
 <template>
@@ -48,7 +49,7 @@ const onSubmit = handleSubmit(async (values) => {
       {{ serverError }}
     </div>
 
-    <form @submit="onSubmit" class="space-y-4">
+    <form @submit.prevent="onSubmit" class="space-y-4" novalidate>
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
         <input
@@ -57,9 +58,9 @@ const onSubmit = handleSubmit(async (values) => {
           autocomplete="email"
           placeholder="officer@loanflow.com"
           :class="['w-full px-3.5 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors',
-                   emailError ? 'border-red-300 bg-red-50' : 'border-slate-300']"
+                   errors.email ? 'border-red-300 bg-red-50' : 'border-slate-300']"
         />
-        <p v-if="emailError" class="text-red-500 text-xs mt-1">{{ emailError }}</p>
+        <p v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email }}</p>
       </div>
 
       <div>
@@ -70,17 +71,17 @@ const onSubmit = handleSubmit(async (values) => {
           autocomplete="current-password"
           placeholder="••••••••"
           :class="['w-full px-3.5 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors',
-                   passwordError ? 'border-red-300 bg-red-50' : 'border-slate-300']"
+                   errors.password ? 'border-red-300 bg-red-50' : 'border-slate-300']"
         />
-        <p v-if="passwordError" class="text-red-500 text-xs mt-1">{{ passwordError }}</p>
+        <p v-if="errors.password" class="text-red-500 text-xs mt-1">{{ errors.password }}</p>
       </div>
 
       <button
         type="submit"
-        :disabled="isSubmitting"
-        class="w-full bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white py-2.5 rounded-lg font-medium transition-colors"
+        :disabled="submitting"
+        class="w-full bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-lg font-medium transition-colors"
       >
-        {{ isSubmitting ? 'Signing in...' : 'Sign in' }}
+        {{ submitting ? 'Signing in...' : 'Sign in' }}
       </button>
     </form>
 

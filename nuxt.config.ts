@@ -17,8 +17,7 @@ export default defineNuxtConfig({
   // ── Modules ─────────────────────────────────────────────────────────
   // Modules auto-configure themselves — no manual app.use() like plain Vue.
   modules: [
-    '@pinia/nuxt',        // State management (defineStore)
-    '@vee-validate/nuxt', // Form validation (useForm, useField)
+    '@pinia/nuxt',  // State management (defineStore)
   ],
 
   // ── CSS ─────────────────────────────────────────────────────────────
@@ -49,9 +48,20 @@ export default defineNuxtConfig({
     },
   },
 
+  // ── Nitro (server engine) ────────────────────────────────────────────
+  // 'vercel' preset auto-detected when VERCEL env var is present.
+  // Explicitly set here so local `nuxt build` also produces a Vercel-ready
+  // output when needed. Nitro wraps API routes as Vercel serverless functions.
+  nitro: {
+    preset: process.env.VERCEL ? 'vercel' : undefined,
+  },
+
+  // ── Dev server ───────────────────────────────────────────────────────
+  devServer: { port: 4000 },
+
   // ── SSR ──────────────────────────────────────────────────────────────
   ssr: true,
 
   // ── Dev tools ────────────────────────────────────────────────────────
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
 })
